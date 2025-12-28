@@ -24,7 +24,11 @@ const templates = {
 
 const userCode = ref(templates.c)
 
+// Language Persistence
+const PREF_KEY = 'apcs_preferred_lang'
+
 watch(selectedLang, (newLang) => {
+    localStorage.setItem(PREF_KEY, newLang)
     if (templates[newLang]) {
         userCode.value = templates[newLang]
     }
@@ -84,9 +88,19 @@ const postComment = async () => {
 }
 
 onMounted(async () => {
+    // Restore preference
+    const savedLang = localStorage.getItem(PREF_KEY)
+    if (savedLang && ['c', 'cpp', 'java', 'python'].includes(savedLang)) {
+        selectedLang.value = savedLang
+        // Also update code if it was default
+        if (templates[savedLang]) {
+            userCode.value = templates[savedLang]
+        }
+    }
+
   const id = route.params.id
   try {
-    const res = await fetch(`/api/questions/implementation/${id}`)
+    const res = await fetch(`/api/questions/implementation/${{id}}`)
     question.value = await res.json()
     fetchComments()
   } catch (e) {

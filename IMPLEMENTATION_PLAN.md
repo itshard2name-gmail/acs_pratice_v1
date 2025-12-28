@@ -293,3 +293,22 @@ Ensure all AI-generated content (Concepts & Problems) aligns with the Taiwan APC
     - Update system prompts to explicitly request "Traditional Chinese (繁體中文)".
     - "You are a specialized APCS tutor in Taiwan..."
     - "Output must be in Traditional Chinese (Taiwan user locale)."
+
+## 13. Phase 15: 2025 APCS Reform Alignment (Advanced Exam Config)
+### Goal
+Align the "Mock Exam" and "Question Generation" with the 2025 APCS structure reforms.
+
+### 2025 Reform Reference
+- **Concept (程式識讀)**: 
+    - 30 Questions (Reduced from 40).
+    - 90 Minutes.
+    - Single Difficulty.
+- **Implementation (程式實作)**: 
+    - **Graded Difficulty**: Choice of Basic (初級), Intermediate (中級), Adv. Intermediate (中高級), Advanced (高級).
+    - **Quota**: 3 Questions per exam.
+    - **Time**: 120 Minutes.
+
+### Future Proposed Changes
+- **Database**: Add `difficulty` column to `questions_implementation` (Enum: 1-4).
+- **Admin UI**: Add "Difficulty" selector in `AdminProblem.vue` (and AI Generator).
+- **Exam UI**: Add "Select Level" modal before starting Mock Exam.
