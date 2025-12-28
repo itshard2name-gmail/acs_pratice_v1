@@ -25,7 +25,8 @@ const MONACO_EDITOR_OPTIONS = {
   formatOnPaste: true,
   minimap: {
     enabled: false
-  }
+  },
+  fontSize: 16
 }
 
 const handleMount = (editor) => {

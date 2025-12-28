@@ -317,40 +317,43 @@ const submitCode = async () => {
     <!-- Right Panel: Code Editor -->
     <div class="w-full md:w-1/2 flex flex-col bg-[#1e1e1e] border-l border-gray-800 relative">
       <div class="flex items-center justify-between px-4 py-2 bg-[#252526] border-b border-[#333]">
-        <select v-model="selectedLang" class="bg-[#3c3c3c] text-gray-200 rounded px-3 py-1 text-sm outline-none border border-[#333] hover:border-[#555]">
-          <option value="c">C</option>
-          <option value="cpp">C++</option>
-          <option value="java">Java</option>
-          <option value="python">Python</option>
-        </select>
-        <div class="flex gap-2">
+        <div class="flex items-center gap-4">
+            <select v-model="selectedLang" class="bg-[#3c3c3c] text-gray-200 rounded px-3 py-1.5 text-sm outline-none border border-[#333] hover:border-[#555] transition-colors cursor-pointer">
+              <option value="c">C</option>
+              <option value="cpp">C++</option>
+              <option value="java">Java</option>
+              <option value="python">Python</option>
+            </select>
+            <div class="h-6 w-px bg-[#333]"></div>
             <button 
               @click="showOutput = !showOutput"
-              class="text-gray-400 hover:text-white px-3 py-1 rounded text-sm font-medium flex items-center gap-1 transition-colors"
+              class="text-gray-400 hover:text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-2 transition-colors"
               :class="showOutput ? 'text-white bg-[#333]' : ''">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
               <span>Console</span>
             </button>
-            <div class="h-6 w-px bg-[#333] mx-1"></div>
+        </div>
+
+        <div class="flex items-center gap-3">
             <button 
               @click="getHint"
               :disabled="executing"
-              class="text-purple-400 hover:text-purple-300 px-3 py-1 rounded text-sm font-medium flex items-center gap-1 disabled:opacity-50 transition-colors">
+              class="text-purple-400 hover:text-purple-300 px-3 py-1.5 rounded text-sm font-medium flex items-center gap-2 disabled:opacity-50 transition-colors hover:bg-purple-500/10">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
               <span>AI Hint</span>
             </button>
-            <div class="h-6 w-px bg-[#333] mx-1"></div>
+            <div class="h-6 w-px bg-[#333]"></div>
             <button 
               @click="runCode"
               :disabled="executing"
-              class="text-gray-400 hover:text-white px-3 py-1 rounded text-sm font-medium flex items-center gap-1 disabled:opacity-50 transition-colors">
+              class="text-green-500 hover:text-green-400 px-3 py-1.5 rounded text-sm font-bold flex items-center gap-2 disabled:opacity-50 transition-colors hover:bg-green-500/10">
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>
               <span>Run Sample</span>
             </button>
             <button 
               @click="submitCode"
               :disabled="executing"
-              class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-1 rounded text-sm font-bold flex items-center gap-2 disabled:opacity-50 transition-colors shadow-lg shadow-teal-900/20">
+              class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-1.5 rounded text-sm font-bold flex items-center gap-2 disabled:opacity-50 transition-all shadow-lg shadow-teal-900/20 hover:shadow-teal-700/30 hover:-translate-y-0.5">
               <span v-if="executing" class="flex items-center gap-2">
                   <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                   Processing...

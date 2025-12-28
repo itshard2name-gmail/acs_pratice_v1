@@ -229,7 +229,8 @@ const submitExam = async () => {
                     </div>
                     <div class="flex-grow">
                         <h3 class="text-lg font-bold text-white mb-3">{{ q.title }}</h3>
-                        <p class="text-gray-400 mb-6 bg-[#1e1e1e] p-4 rounded-lg font-mono text-sm leading-relaxed whitespace-pre-wrap border border-[#333]">{{ q.code_snippet }}</p>
+                        <div class="text-gray-300 mb-4 whitespace-pre-wrap leading-relaxed">{{ q.content }}</div>
+                        <p v-if="q.code_snippet" class="text-gray-400 mb-6 bg-[#1e1e1e] p-4 rounded-lg font-mono text-sm leading-relaxed whitespace-pre-wrap border border-[#333]">{{ q.code_snippet }}</p>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                              <label v-for="(opt, oIdx) in q.options" :key="oIdx" 
