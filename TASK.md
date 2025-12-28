@@ -27,6 +27,7 @@
     - [x] User Profile & History UI <!-- id: 42 -->
 - [x] Phase 6: Advanced Judge Features <!-- id: 50 -->
     - [x] C/C++ Support (GCC) <!-- id: 51 -->
+    - [x] Java Support (OpenJDK) <!-- id: 53 -->
     - [x] Hidden Test Case Evaluation <!-- id: 52 -->
 - [x] Phase 7: Mock Exam Mode <!-- id: 60 -->
     - [x] Standard Exam Timer Logic <!-- id: 61 -->

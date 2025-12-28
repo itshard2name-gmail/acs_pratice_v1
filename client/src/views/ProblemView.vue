@@ -16,6 +16,22 @@ const outputLog = ref('')
 const selectedLang = ref('c')
 const executing = ref(false)
 
+const templates = {
+    c: `#include <stdio.h>\n\nint main() {\n    int a, b;\n    scanf("%d %d", &a, &b);\n    printf("%d\\n", a + b);\n    return 0;\n}`,
+    cpp: `#include <iostream>\nusing namespace std;\n\nint main() {\n    int a, b;\n    cin >> a >> b;\n    cout << a + b << endl;\n    return 0;\n}`,
+    java: `import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner s = new Scanner(System.in);\n        if (s.hasNext()) {\n            System.out.println(s.next());\n        }\n    }\n}`,
+    python: `# Write your code here\nimport sys\n\nfor line in sys.stdin:\n    print(line.strip())`
+}
+
+import { watch } from 'vue'
+
+const userCode = ref(templates.c)
+
+watch(selectedLang, (newLang) => {
+    if (templates[newLang]) {
+        userCode.value = templates[newLang]
+    }
+})
 // Discussion State
 const activeTab = ref('description') // 'description' or 'discussion'
 const comments = ref([])

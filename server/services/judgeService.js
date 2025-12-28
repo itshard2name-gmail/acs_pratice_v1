@@ -71,4 +71,42 @@ const executeCpp = async (code, input) => {
     }
 };
 
-module.exports = { executePython, executeCpp };
+const executeJava = async (code, input) => {
+    // Java requires the class name to match the file name. 
+    // We enforce "public class Main" so we save as Main.java.
+    // To avoid collisions in concurrent requests, we use a unique folder for each submission.
+    const uniqueId = `${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    const workDir = path.join(TEMP_DIR, uniqueId);
+
+    if (!fs.existsSync(workDir)) {
+        fs.mkdirSync(workDir, { recursive: true });
+    }
+
+    const filename = 'Main.java';
+    const filepath = path.join(workDir, filename);
+
+    try {
+        fs.writeFileSync(filepath, code);
+
+        // Command: javac Main.java && echo 'input' | java Main
+        // We mount the workDir to /mnt in the container
+        const safeInput = input ? input.replace(/'/g, "'\\''") : '';
+        const dockerCmd = `docker run --rm --network none -v "${workDir}:/mnt" amazoncorretto:17-alpine sh -c "cd /mnt && javac Main.java && echo '${safeInput}' | java Main"`;
+
+        const { stdout, stderr } = await execPromise(dockerCmd, { timeout: 5000 }); // Java JVM startup might take a bit
+        return { stdout: stdout.trim(), stderr: stderr.trim(), time: '0.1s' };
+
+    } catch (error) {
+        if (error.killed) {
+            return { stdout: '', stderr: 'Time Limit Exceeded' };
+        }
+        return { stdout: '', stderr: error.stderr || error.message };
+    } finally {
+        // Cleanup the whole directory
+        if (fs.existsSync(workDir)) {
+            fs.rmSync(workDir, { recursive: true, force: true });
+        }
+    }
+};
+
+module.exports = { executePython, executeCpp, executeJava };

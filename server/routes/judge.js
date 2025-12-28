@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { executePython, executeCpp } = require('../services/judgeService');
+const { executePython, executeCpp, executeJava } = require('../services/judgeService');
 const { authenticateToken } = require('../middleware/auth');
 const db = require('../db');
 
@@ -14,7 +14,9 @@ router.post('/execute', async (req, res) => {
         if (language === 'python') {
             result = await executePython(code, input);
         } else if (language === 'c' || language === 'cpp') {
-            result = await executeCpp(code, input); // Now supported
+            result = await executeCpp(code, input);
+        } else if (language === 'java') {
+            result = await executeJava(code, input); // Now supported
         } else {
             result = { stdout: '', stderr: `Language ${language} not supported yet` };
         }
@@ -56,6 +58,8 @@ router.post('/submit', authenticateToken, async (req, res) => {
                 result = await executePython(code, tc.input_data);
             } else if (language === 'c' || language === 'cpp') {
                 result = await executeCpp(code, tc.input_data);
+            } else if (language === 'java') {
+                result = await executeJava(code, tc.input_data);
             } else {
                 return res.status(400).json({ error: 'Language not supported' });
             }

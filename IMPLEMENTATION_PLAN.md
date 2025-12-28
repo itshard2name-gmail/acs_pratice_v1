@@ -91,6 +91,7 @@ The goal is to build a web-based platform for students to practice for the **Tai
     - User Profile & Submission History.
 6.  **Phase 6: Advanced Judge Feature (Judge V2)**:
     - Add GCC/G++ support for C/C++.
+    - Add OpenJDK support for Java.
     - Implement "Hidden Test Cases" (Full Submission vs Sample Run).
     - Secure the Sandbox (Memory limits, File system restriction).
 7.  **Phase 7: Mock Exam Mode**:
@@ -220,3 +221,40 @@ Extend bulk generation to "Coding Problems" (Implementation Mode).
 ### Verification Plan
 - Generate 2 Coding Problems on "Arrays".
 - Verify they have Description and Test Cases.
+
+## 10. Java Support Implementation (feature/java-support)
+### Goal
+Enable users to submit Java code for Implementation Problems.
+
+### Proposed Changes
+#### Server
+- `server/services/judgeService.js`:
+    - Add `executeJava` function.
+    - Use `openjdk:17-alpine` image (lightweight).
+    - File strategy: Save as `Main.java`. This implies we expect the user to use `public class Main` or we strip `public` and use a consistent filename.
+    - **Constraint**: User MUST use `class Main`.
+    - Command: `javac /mnt/Main.java && echo 'input' | java -cp /mnt Main`.
+- `server/routes/judge.js`:
+    - Map `java` language string to `executeJava`.
+
+#### Client
+- `client/src/views/ProblemView.vue`:
+    - (UX Improvement) Add default boilerplate code when switching languages, so users see `public class Main` immediately when selecting Java.
+
+### Verification Plan
+- **Manual Test**:
+    - Select "Java".
+    - Write:
+      ```java
+      import java.util.Scanner;
+      public class Main {
+          public static void main(String[] args) {
+              Scanner s = new Scanner(System.in);
+              if (s.hasNext()) {
+                  System.out.println(s.next());
+              }
+          }
+      }
+      ```
+    - Run with input "Hello".
+    - Verify Output: "Hello".
