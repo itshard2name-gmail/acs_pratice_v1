@@ -68,7 +68,7 @@
 - [x] Phase 14: Content Localization (Traditional Chinese) <!-- id: 150 -->
     - [x] Update AI Prompts in `server/routes/ai.js` <!-- id: 151 -->
 - [ ] Phase 15: 2025 APCS Reform Alignment <!-- id: 160 -->
-    - [ ] DB Schema: Add `difficulty` to questions <!-- id: 161 -->
-    - [ ] Admin UI: Difficulty Selector for AI & Manual <!-- id: 162 -->
+    - [x] DB Schema: Add `difficulty` to questions <!-- id: 161 -->
+    - [x] Admin UI: Difficulty Selector for AI & Manual <!-- id: 162 -->
     - [ ] Exam UI: Level Selection Modal <!-- id: 163 -->
 

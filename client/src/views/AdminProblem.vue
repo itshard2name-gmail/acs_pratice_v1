@@ -6,6 +6,7 @@ const form = ref({
   description: '',
   time_limit: 1000,
   memory_limit: 256,
+  difficulty: 1, // 1=Basic, 2=Intermediate, 3=Adv. Inter, 4=Advanced
   test_cases: [
     { input: '', output: '', is_sample: true },
     { input: '', output: '', is_sample: false }
@@ -16,13 +17,15 @@ const submitting = ref(false)
 const generating = ref(false)
 const message = ref('')
 const generateTopic = ref('')
+const generateDifficulty = ref(1)
 const showGenModal = ref(false)
 
 // Bulk Generation State
 const showBulkModal = ref(false)
 const bulkConfig = ref({
     topic: '', // Empty = Random
-    count: 3
+    count: 3,
+    difficulty: 1
 })
 const generatedList = ref([]) // Array of questions to review
 const TOPIC_OPTIONS_IMPL = [
@@ -49,11 +52,12 @@ const removeTestCase = (index) => {
 const openGenModal = () => {
   showGenModal.value = true
   generateTopic.value = ''
+  generateDifficulty.value = 1
 }
 
 const openBulkModal = () => {
     showBulkModal.value = true
-    bulkConfig.value = { topic: '', count: 3 }
+    bulkConfig.value = { topic: '', count: 3, difficulty: 1 }
 }
 
 const generateProblem = async () => {
@@ -66,7 +70,10 @@ const generateProblem = async () => {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${localStorage.getItem('token')}` 
             },
-            body: JSON.stringify({ topic: generateTopic.value })
+            body: JSON.stringify({ 
+                topic: generateTopic.value,
+                difficulty: generateDifficulty.value
+            })
         })
         
         if (!res.ok) {
@@ -96,7 +103,8 @@ const generateBatch = async () => {
     try {
         const payload = {
             count: bulkConfig.value.count,
-            topic: bulkConfig.value.topic === 'custom' ? bulkConfig.value.customTopic : bulkConfig.value.topic
+            topic: bulkConfig.value.topic === 'custom' ? bulkConfig.value.customTopic : bulkConfig.value.topic,
+            difficulty: bulkConfig.value.difficulty
         }
 
         const res = await fetch('/api/ai/generate-implementation-batch', {
@@ -157,6 +165,7 @@ const fillFormFromBatch = (index) => {
         description: questionData.description || '',
         time_limit: questionData.time_limit || 1000,
         memory_limit: questionData.memory_limit || 256,
+        difficulty: 1, // Default to 1 if not present, though batch usually won't have it unless prompted in description
         test_cases: questionData.test_cases || []
     }
     message.value = 'Loaded problem from batch list.'
@@ -184,6 +193,7 @@ const submit = async () => {
         description: '',
         time_limit: 1000,
         memory_limit: 256,
+        difficulty: 1,
         test_cases: [
             { input: '', output: '', is_sample: true }
         ]
@@ -224,7 +234,19 @@ const submit = async () => {
         <div class="bg-white p-6 rounded shadow-lg w-96">
             <h3 class="font-bold text-lg mb-2">Generate Problem with AI</h3>
             <p class="text-sm text-gray-600 mb-4">Enter a topic (e.g. "Dynamic Programming") and AI will draft a problem.</p>
-            <input v-model="generateTopic" placeholder="e.g. Fibonacci" class="w-full border p-2 rounded mb-4" @keyup.enter="generateProblem" />
+            <div class="mb-4">
+               <label class="block text-sm font-bold mb-1">Topic</label>
+               <input v-model="generateTopic" placeholder="e.g. Fibonacci" class="w-full border p-2 rounded" @keyup.enter="generateProblem" />
+            </div>
+            <div class="mb-4">
+               <label class="block text-sm font-bold mb-1">Difficulty</label>
+               <select v-model="generateDifficulty" class="w-full border p-2 rounded">
+                  <option :value="1">Basic (初級)</option>
+                  <option :value="2">Intermediate (中級)</option>
+                  <option :value="3">Adv. Inter (中高級)</option>
+                  <option :value="4">Advanced (高級)</option>
+               </select>
+            </div>
             <div class="flex justify-end gap-2">
                 <button @click="showGenModal = false" class="text-gray-500 px-3 py-1 hover:bg-gray-100 rounded">Cancel</button>
                 <button 
@@ -257,6 +279,16 @@ const submit = async () => {
                         <option value="custom">Other (Manual Entry)</option>
                     </select>
                     <input v-if="bulkConfig.topic === 'custom'" v-model="bulkConfig.customTopic" placeholder="Enter custom topic..." class="w-full border p-2 rounded" />
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-bold mb-1">Difficulty</label>
+                     <select v-model="bulkConfig.difficulty" class="w-full border p-2 rounded">
+                        <option :value="1">Basic (初級)</option>
+                        <option :value="2">Intermediate (中級)</option>
+                        <option :value="3">Adv. Inter (中高級)</option>
+                        <option :value="4">Advanced (高級)</option>
+                     </select>
                 </div>
 
                 <div class="mb-6">
@@ -322,6 +354,15 @@ const submit = async () => {
           <div>
             <label class="block text-sm font-medium mb-1">Title</label>
             <input v-model="form.title" class="w-full border p-2 rounded" type="text" placeholder="e.g. Sum of Array">
+            <div class="mt-2">
+                <label class="block text-sm font-medium mb-1">Difficulty Level</label>
+                <select v-model="form.difficulty" class="w-full border p-2 rounded bg-white">
+                    <option :value="1">Basic (初級)</option>
+                    <option :value="2">Intermediate (中級)</option>
+                    <option :value="3">Adv. Inter (中高級)</option>
+                    <option :value="4">Advanced (高級)</option>
+                </select>
+            </div>
           </div>
           <div class="grid grid-cols-2 gap-2">
               <div>

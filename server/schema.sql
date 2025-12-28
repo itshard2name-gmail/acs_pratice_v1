@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS questions_implementation (
     description TEXT NOT NULL,
     time_limit INT DEFAULT 1000,
     memory_limit INT DEFAULT 256,
+    difficulty INT DEFAULT 1 CHECK (difficulty BETWEEN 1 AND 4),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

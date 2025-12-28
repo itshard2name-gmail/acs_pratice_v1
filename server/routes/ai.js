@@ -103,12 +103,23 @@ router.post('/generate-question', authenticateToken, async (req, res) => {
 });
 
 router.post('/generate-implementation', authenticateToken, async (req, res) => {
-    const { topic } = req.body;
+    const { topic, difficulty } = req.body;
     if (!topic) return res.status(400).json({ error: "Topic is required" });
+
+    // Map difficulty level (1-4) to description
+    const levels = {
+        1: "Basic (APCS 初級 - Basic IO, Conditions, Loops)",
+        2: "Intermediate (APCS 中級 - Nested Loops, Arrays, Strings)",
+        3: "Advanced Intermediate (APCS 中高級 - Recursion, Sorting, Searching)",
+        4: "Advanced (APCS 高級 - DP, Graphs, Trees)"
+    };
+    const diffDesc = levels[difficulty] || levels[1];
 
     try {
         const prompt = `
         Generate 1 APCS (Advanced Placement Computer Science) coding problem about "${topic}".
+        Difficulty Level: ${diffDesc}.
+        The content MUST be in Traditional Chinese (繁體中文).
         The content MUST be in Traditional Chinese (繁體中文).
         
         Output STRICT JSON format matching this schema:
@@ -219,16 +230,25 @@ const TOPICS_IMPL = [
 ];
 
 router.post('/generate-implementation-batch', authenticateToken, async (req, res) => {
-    let { topic, count } = req.body;
+    let { topic, count, difficulty } = req.body;
     count = parseInt(count) || 1;
     if (count > 3) count = 3; // Cap max coding problems (expensive/slow)
     if (count < 1) count = 1;
+
+    // Map difficulty level (1-4) to description
+    const levels = {
+        1: "Basic (APCS 初級)",
+        2: "Intermediate (APCS 中級)",
+        3: "Advanced Intermediate (APCS 中高級)",
+        4: "Advanced (APCS 高級)"
+    };
+    const diffDesc = levels[difficulty] || levels[1];
 
     try {
         let promptContext = "";
 
         if (topic) {
-            promptContext = `Generate ${count} APCS (Advanced Placement Computer Science) coding problems about "${topic}".`;
+            promptContext = `Generate ${count} APCS (Advanced Placement Computer Science) coding problems about "${topic}". Difficulty: ${diffDesc}.`;
         } else {
             // Randomly select topics
             const selectedTopics = [];

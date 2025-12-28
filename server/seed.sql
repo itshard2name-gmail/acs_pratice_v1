@@ -21,7 +21,8 @@ WITH new_question AS (
         'Sum of Two Numbers',
         E'# Sum of Two Numbers\n\nGiven two integers A and B, output their sum.\n\n## Input\nTwo integers A and B separated by a space.\n\n## Output\nA single integer representing A + B.',
         1000,
-        256
+        256,
+        1
     )
     RETURNING id
 )

@@ -3,9 +3,21 @@ const router = express.Router();
 const db = require('../db');
 
 // GET all implementation questions
+// GET all implementation questions (optional filter by difficulty)
 router.get('/', async (req, res) => {
     try {
-        const result = await db.query('SELECT * FROM questions_implementation ORDER BY id ASC');
+        const { difficulty } = req.query;
+        let query = 'SELECT * FROM questions_implementation';
+        const params = [];
+
+        if (difficulty) {
+            query += ' WHERE difficulty = $1';
+            params.push(difficulty);
+        }
+
+        query += ' ORDER BY id ASC';
+
+        const result = await db.query(query, params);
         res.json(result.rows);
     } catch (err) {
         console.error(err);
@@ -15,14 +27,14 @@ router.get('/', async (req, res) => {
 
 // POST create implementation question
 router.post('/', async (req, res) => {
-    const { title, description, time_limit, memory_limit, test_cases } = req.body;
+    const { title, description, time_limit, memory_limit, difficulty, test_cases } = req.body;
 
     const client = await db.pool.connect();
     try {
         await client.query('BEGIN');
         const qResult = await client.query(
-            'INSERT INTO questions_implementation (title, description, time_limit, memory_limit) VALUES ($1, $2, $3, $4) RETURNING id',
-            [title, description, time_limit || 1000, memory_limit || 256]
+            'INSERT INTO questions_implementation (title, description, time_limit, memory_limit, difficulty) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+            [title, description, time_limit || 1000, memory_limit || 256, difficulty || 1]
         );
         const qId = qResult.rows[0].id;
 
