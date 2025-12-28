@@ -5,12 +5,16 @@ const { authenticateToken } = require('../middleware/auth');
 
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+// Use a model that supports JSON mode
+// Use a model that supports JSON mode
+// Use a model that supports JSON mode
+const model = genAI.getGenerativeModel({
+    model: "gemini-flash-latest",
+    generationConfig: { responseMimeType: "application/json" }
+});
 
 router.post('/hint', authenticateToken, async (req, res) => {
     console.log("AI Request received.");
-    console.log("API Key Present:", !!process.env.GEMINI_API_KEY);
-    if (process.env.GEMINI_API_KEY) console.log("API Key Length:", process.env.GEMINI_API_KEY.length);
 
     const { code, language, problemTitle, problemDescription } = req.body;
 
@@ -19,6 +23,12 @@ router.post('/hint', authenticateToken, async (req, res) => {
     }
 
     try {
+        // Hint doesn't strictly need JSON mode, but we can just use text mode for this one by getting a standard model instance if needed,
+        // OR just parse the response. But for hints, we usually want plain text. 
+        // Let's use a separate model instance for text-only generation if we want to avoid JSON constraint, 
+        // OR just tell it to return a JSON object with a "hint" field.
+        // For simplicity, let's keep the hint endpoint returning JSON { hint: "..." }
+
         const prompt = `
         You are a helpful Computer Science Tutor for a high school APCS exam.
         The student is solving the problem: "${problemTitle}".
@@ -35,19 +45,25 @@ router.post('/hint', authenticateToken, async (req, res) => {
         - Do NOT write the code for them.
         - Point out syntax errors, logic flaws, or edge cases they might have missed.
         - Be concise (max 3 sentences).
+        
+        Output JSON: { "hint": "Your hint here" }
         `;
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
         const text = response.text();
 
-        res.json({ hint: text });
+        // Even with JSON mode, we should parse it to be safe
+        const data = JSON.parse(text);
+        res.json(data);
+
     } catch (error) {
         console.error("Gemini API Error Details:", error);
         if (error.status === 429) {
             return res.status(429).json({ error: "AI is busy (Rate Limit). Please wait 1 minute." });
         }
-        res.status(500).json({ error: "Failed to generate hint. AI is tired." });
+        // Fallback if JSON parse fails or other error
+        res.status(500).json({ error: "Failed to generate hint." });
     }
 });
 
@@ -68,16 +84,11 @@ router.post('/generate-question', authenticateToken, async (req, res) => {
           "answer_index": 0,
           "explanation": "Why A is correct..."
         }
-        
-        Do not use markdown formatting in the output (no \`\`\`json). Just raw JSON string.
         `;
 
         const result = await model.generateContent(prompt);
         const text = result.response.text();
-
-        // Clean up markdown if AI adds it despite instructions
-        const jsonText = text.replace(/```json/g, '').replace(/```/g, '').trim();
-        const data = JSON.parse(jsonText);
+        const data = JSON.parse(text);
 
         res.json(data);
     } catch (error) {
@@ -107,16 +118,11 @@ router.post('/generate-implementation', authenticateToken, async (req, res) => {
             { "input": "-5 5", "output": "0", "is_sample": false }
           ]
         }
-        
-        Do not use markdown formatting in the output (no \`\`\`json). Just raw JSON string.
-        Ensure the description is in Markdown format.
         `;
 
         const result = await model.generateContent(prompt);
         const text = result.response.text();
-
-        const jsonText = text.replace(/```json/g, '').replace(/```/g, '').trim();
-        const data = JSON.parse(jsonText);
+        const data = JSON.parse(text);
 
         res.json(data);
     } catch (error) {

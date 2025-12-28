@@ -141,3 +141,22 @@ Since there is no official API for APCS questions (mostly PDFs), we will use a h
 1.  **Manual Entry (Admin)**: The Admin portal will have a "Create Question" form to manually input questions from released PDF exams.
 2.  **Community Repositories**: Use data from open-source repos like `twyu/APCS` or `kungyanling/APCS` as a reference to copy-paste problem descriptions and test cases.
 3.  **AI Generation (Teacher Aid)**: Integrate an LLM (Gemini/GPT) feature in the Admin block to "Generate similar concept questions" or "Parse PDF text to Markdown" to speed up data entry.
+
+## 8. Refinement 2025-12-28
+### Goal
+Ensure the AI Question Generator returns clean, valid JSON without any markdown formatting or "thinking" text, to prevent parsing errors in the frontend.
+
+### Proposed Changes
+#### Server
+- `server/routes/ai.js`:
+    - Update `getGenerativeModel` or `generateContent` to use `generationConfig: { responseMimeType: "application/json" }`.
+    - Refine prompts to be stricter about JSON output if needed, though `responseMimeType` should handle it.
+
+### Verification Plan
+#### Automated Tests
+- Run the following command to generate a question and verify the output is raw JSON:
+```bash
+TOKEN=$(curl -s -X POST http://localhost:3000/api/auth/login -H "Content-Type: application/json" -d '{"email":"admin@example.com", "password":"admin123"}' | grep -o '"token":"[^"]*"' | cut -d'"' -f4)
+curl -s -X POST http://localhost:3000/api/ai/generate-question -H "Content-Type: application/json" -H "Authorization: Bearer $TOKEN" -d '{"topic": "Recursion"}'
+```
+- Verify no ` ```json ` fences are present in the output.

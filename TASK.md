@@ -52,3 +52,5 @@
     - [x] Dockerfile for Client and Server <!-- id: 101 -->
     - [x] docker-compose.yml for Full Stack <!-- id: 102 -->
     - [x] GitHub Actions CI Workflow <!-- id: 103 -->
+- [x] Refinement 2025-12-28 <!-- id: 120 -->
+    - [x] Refine AI Question Generator Prompts to prevent Chain-of-Thought leakage in output <!-- id: 121 -->
