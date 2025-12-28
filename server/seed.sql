@@ -16,7 +16,7 @@ VALUES (
 
 -- 3. Create Sample Implementation Problem
 WITH new_question AS (
-    INSERT INTO questions_implementation (title, description, time_limit, memory_limit)
+    INSERT INTO questions_implementation (title, description, time_limit, memory_limit, difficulty)
     VALUES (
         'Sum of Two Numbers',
         E'# Sum of Two Numbers\n\nGiven two integers A and B, output their sum.\n\n## Input\nTwo integers A and B separated by a space.\n\n## Output\nA single integer representing A + B.',
