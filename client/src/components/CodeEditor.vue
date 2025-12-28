@@ -46,7 +46,7 @@ const handleChange = (val) => {
       :options="MONACO_EDITOR_OPTIONS"
       @mount="handleMount"
       @change="handleChange"
-      class="h-[500px]"
+      class="h-full"
     />
   </div>
 </template>

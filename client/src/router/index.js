@@ -12,12 +12,15 @@ import MockExamView from '../views/MockExamView.vue'
 
 
 
+import LandingView from '../views/LandingView.vue'
+
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
         {
             path: '/',
-            redirect: '/concept'
+            name: 'Landing',
+            component: LandingView
         },
         {
             path: '/concept',

@@ -262,7 +262,7 @@ router.post('/generate-implementation-batch', authenticateToken, async (req, res
                 const randomTopic = TOPICS_IMPL[Math.floor(Math.random() * TOPICS_IMPL.length)];
                 selectedTopics.push(randomTopic);
             }
-            promptContext = `Generate ${count} APCS coding problems. Cover these topics in order:\n` +
+            promptContext = `Generate ${count} APCS coding problems. ${diffContext}\nCover these topics in order:\n` +
                 selectedTopics.map((t, i) => `${i + 1}. ${t}`).join('\n');
         }
 
