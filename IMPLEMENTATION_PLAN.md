@@ -1,4 +1,6 @@
 # APCS Practice Platform - Requirements Specification
+> [!IMPORTANT]
+> **AGENT RULE**: Do NOT merge to `main` without user permission. See `AGENT_RULES.md`.
 
 ## 1. Product Overview
 The goal is to build a web-based platform for students to practice for the **Taiwan APCS (Advanced Placement Computer Science)** exam. The platform must simulate the actual exam environment and provide learning feedback.
@@ -258,3 +260,25 @@ Enable users to submit Java code for Implementation Problems.
       ```
     - Run with input "Hello".
     - Verify Output: "Hello".
+
+## 11. Phase 13: UI Optimization - Coding Problems
+### Goal
+Enhance the user experience of the "Coding Problems" interface (`ProblemView.vue`).
+
+### Areas for Optimization (To be Refined)
+- **Layout**: Better split between Description and Editor? (Resizable?)
+- **Editor**: Theme toggle? Font size? Auto-closing brackets?
+- **Output**: Improved console visibility? Real-time status?
+- **Mobile**: Is it responsive?
+
+### Proposed Changes
+#### Client
+- `client/src/views/ProblemView.vue`:
+    - Refactor layout using CSS Grid or Flexbox for better space utilization.
+    - Add resizable split pane (optional).
+    - Improve "Run" and "Submit" feedback visual.
+
+### Verification Plan
+- **Manual Test**:
+    - Verify layout on different screen sizes.
+    - Verify editor responsiveness.
