@@ -100,7 +100,7 @@ onMounted(async () => {
 
   const id = route.params.id
   try {
-    const res = await fetch(`/api/questions/implementation/${{id}}`)
+    const res = await fetch(`/api/questions/implementation/${id}`)
     question.value = await res.json()
     fetchComments()
   } catch (e) {
