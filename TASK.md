@@ -74,9 +74,14 @@
 - [ ] Phase 16: OCI Production Deployment <!-- id: 170 -->
     - [x] Create Local Cloudflare Demo (docker-compose.demo.yml) <!-- id: 172 -->
     - [ ] Create Production Docker Compose (docker-compose.prod.yml) <!-- id: 171 -->
-- [ ] Phase 17: Critical Security & Judge Refactor <!-- id: 180 -->
+- [x] Phase 17: Critical Security & Judge Refactor <!-- id: 180 -->
     - [x] Security: Fix RCE in `judgeService.js` (Use safe spawn/execFile) <!-- id: 181 -->
     - [x] Isolation: Fix Shared Directory Vulnerability (Unique temp dirs per run) <!-- id: 182 -->
     - [x] Stability: Implement Output Normalization (Trim/Line Endings) <!-- id: 183 -->
     - [x] Safety: Add Resource Limits (Memory/Timeout/Output Size) <!-- id: 184 -->
+- [x] Phase 18: Admin Module Refactor (Branch: `refactor/admin-module`) <!-- id: 190 -->
+    - [x] Create Admin Portal Dashboard (`AdminDashboard.vue`) <!-- id: 191 -->
+    - [x] Fix Admin Navigation (Cancel Button Redirects) <!-- id: 192 -->
+    - [x] Improve Student Navigation (My Dashboard Link) <!-- id: 193 -->
+    - [x] Security: Implement RBAC for Admin Routes <!-- id: 194 -->
 
