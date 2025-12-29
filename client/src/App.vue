@@ -49,10 +49,10 @@ function logout() {
                   active-class="bg-white/10 text-white"
                 >Coding Problems</router-link>
                 <router-link to="/exam" class="bg-indigo-600 hover:bg-indigo-700 text-white ml-4 px-3 py-2 rounded-md text-sm font-medium shadow-sm">Start Mock Exam</router-link>
-                <router-link v-if="auth.user && auth.user.role === 'admin'" to="/admin/concept" 
+                <router-link v-if="auth.user && auth.user.role === 'admin'" to="/admin" 
                   class="px-3 py-2 rounded-md text-sm font-medium transition-colors text-gray-300 hover:text-white hover:bg-white/10"
                   active-class="bg-white/10 text-white"
-                >Admin</router-link>
+                >Admin Portal</router-link>
               </div>
             </div>
           </div>

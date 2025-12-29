@@ -3,6 +3,7 @@ import ConceptList from '../views/ConceptList.vue'
 import ConceptQuiz from '../views/ConceptQuiz.vue'
 import AdminConcept from '../views/AdminConcept.vue'
 import AdminProblem from '../views/AdminProblem.vue'
+import AdminDashboard from '../views/AdminDashboard.vue'
 import ProblemList from '../views/ProblemList.vue'
 import ProblemView from '../views/ProblemView.vue'
 import LoginView from '../views/LoginView.vue'
@@ -36,6 +37,11 @@ const router = createRouter({
             path: '/admin/concept',
             name: 'AdminConcept',
             component: AdminConcept
+        },
+        {
+            path: '/admin',
+            name: 'AdminDashboard',
+            component: AdminDashboard
         },
         {
             path: '/problem',

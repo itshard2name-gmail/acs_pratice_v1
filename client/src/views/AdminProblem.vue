@@ -322,7 +322,7 @@ const submit = async () => {
                  </div>
                  
                  <div class="mt-8 flex justify-end gap-4 border-t border-[#333] pt-6">
-                      <router-link to="/problem" class="px-6 py-2.5 rounded-lg text-gray-400 hover:bg-[#333] font-bold transition-colors">Cancel</router-link>
+                      <router-link to="/admin" class="px-6 py-2.5 rounded-lg text-gray-400 hover:bg-[#333] font-bold transition-colors">Cancel</router-link>
                       <button 
                         @click="submit" 
                         :disabled="submitting"
