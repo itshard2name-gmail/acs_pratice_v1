@@ -50,4 +50,27 @@ This platform is a full-stack web application designed to help students practice
 
 **Verification**:
 - Use `curl` or the Admin UI to generate batches.
-- Confirm "Random" mode produces diverse topics.
+
+## 6. Maintenance & Standardization (2025-12-29)
+
+### Judge System Repairs
+- **Issue**: "spawn docker ENOENT" and "No such file or directory" errors in Stage environment.
+- **Root Cause**:
+    - Backend container lacked `docker-cli` to spawn sibling containers.
+    - `temp_submissions` files were isolated in the backend container and not visible to the runner container via the host.
+- **Fix**:
+    - Installed `docker-cli` in `server/Dockerfile`.
+    - Added Volume Mount: `./server/temp_submissions:/app/temp_submissions` in `docker-compose.stage.yml` & `.dev.yml`.
+    - Mapped paths using `JUDGE_HOST_PATH` in `.env`.
+
+### Environment Standardization
+- **Goal**: Prevent container naming conflicts between Dev and Stage environments.
+- **Changes**:
+    - **Stage**: Explicitly named `apcs_stage` (Command: `docker compose -p apcs_stage ...`).
+    - **Dev**: Explicitly named `apcs_dev` (Command: `docker compose -p apcs_dev ...`).
+    - Updated `README.md` with standardized commands.
+
+### Security
+- **Action**: Secured `.envrc`.
+    - Removed from Git tracking.
+    - Added `.envrc.example` template.

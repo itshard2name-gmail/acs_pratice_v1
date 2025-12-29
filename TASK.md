@@ -55,6 +55,10 @@
     - [x] GitHub Actions CI Workflow <!-- id: 103 -->
 - [x] Refinement 2025-12-28 <!-- id: 120 -->
     - [x] Refine AI Question Generator Prompts to prevent Chain-of-Thought leakage in output <!-- id: 121 -->
+- [x] Refinement 2025-12-29 <!-- id: 125 -->
+    - [x] Fix Judge System Docker-in-Docker (ENOENT & Volume Mounts) <!-- id: 126 -->
+    - [x] Standardize Docker Envs (apcs_dev VS apcs_stage) <!-- id: 127 -->
+    - [x] Secure .envrc <!-- id: 128 -->
 - [x] Question Bank LLM Integration <!-- id: 130 -->
     - [x] Backend: Bulk Generate API (`/api/ai/generate-batch`) <!-- id: 132 -->
     - [x] Frontend: Bulk Generate UI in `AdminConcept.vue` <!-- id: 133 -->
