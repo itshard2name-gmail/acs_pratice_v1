@@ -36,12 +36,14 @@ const router = createRouter({
         {
             path: '/admin/concept',
             name: 'AdminConcept',
-            component: AdminConcept
+            component: AdminConcept,
+            meta: { requiresAdmin: true }
         },
         {
             path: '/admin',
             name: 'AdminDashboard',
-            component: AdminDashboard
+            component: AdminDashboard,
+            meta: { requiresAdmin: true }
         },
         {
             path: '/problem',
@@ -66,20 +68,46 @@ const router = createRouter({
         {
             path: '/profile',
             name: 'UserProfile',
-            component: UserProfile
+            component: UserProfile,
+            meta: { requiresAuth: true }
         },
         {
             path: '/exam',
             name: 'MockExam',
-            component: MockExamView
+            component: MockExamView,
+            meta: { requiresAuth: true }
         },
 
         {
             path: '/admin/problem',
             name: 'AdminProblem',
-            component: AdminProblem
+            component: AdminProblem,
+            meta: { requiresAdmin: true }
         },
     ]
+})
+
+import { useAuthStore } from '../stores/auth'
+
+router.beforeEach(async (to, from, next) => {
+    const auth = useAuthStore()
+
+    // Ensure user state is restored (optional, depends on store impl)
+    // if (!auth.user) await auth.restoreUser() 
+
+    if (to.meta.requiresAdmin) {
+        if (!auth.user || auth.user.role !== 'admin') {
+            return next('/')
+        }
+    }
+
+    if (to.meta.requiresAuth) {
+        if (!auth.user) {
+            return next('/login')
+        }
+    }
+
+    next()
 })
 
 export default router
