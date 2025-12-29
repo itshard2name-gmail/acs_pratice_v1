@@ -1,111 +1,144 @@
-const { exec } = require('child_process');
+const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const util = require('util');
-const execPromise = util.promisify(exec);
+const crypto = require('crypto');
 
 const TEMP_DIR = path.join(__dirname, '../temp_submissions');
 if (!fs.existsSync(TEMP_DIR)) {
     fs.mkdirSync(TEMP_DIR, { recursive: true });
 }
 
-// Helper to escape input for shell command (basic protection)
-const escapeShell = (cmd) => {
-    return cmd.replace(/"/g, '\\"');
+// Helper: Generate Unique Directory
+const createUniqueDir = () => {
+    const id = crypto.randomUUID ? crypto.randomUUID() : crypto.randomBytes(8).toString('hex');
+    const dir = path.join(TEMP_DIR, id);
+    fs.mkdirSync(dir, { recursive: true });
+    return { dir, id };
+};
+
+// Helper: Run Docker using spawn (Secure, no shell injection)
+const runContainer = (image, cmdArgs, workDir, timeLimit = 3000) => {
+    return new Promise((resolve) => {
+        // Enforce resource limits
+        const dockerArgs = [
+            'run',
+            '--rm',
+            '--network', 'none',    // No internet
+            '--memory', '128m',     // Max 128MB RAM
+            '--cpus', '0.5',        // Max 0.5 CPU
+            '-v', `${workDir}:/mnt`,
+            image,
+            ...cmdArgs
+        ];
+
+        const child = spawn('docker', dockerArgs);
+
+        let stdout = '';
+        let stderr = '';
+        let killed = false;
+
+        // Timeout Timer
+        const timer = setTimeout(() => {
+            killed = true;
+            child.kill('SIGKILL'); // Force kill
+        }, timeLimit);
+
+        // Cap output size to prevent DoS (1MB limit)
+        const MAX_OUTPUT = 1024 * 1024;
+
+        child.stdout.on('data', (data) => {
+            if (stdout.length < MAX_OUTPUT) {
+                stdout += data.toString();
+            }
+        });
+
+        child.stderr.on('data', (data) => {
+            if (stderr.length < MAX_OUTPUT) {
+                stderr += data.toString();
+            }
+        });
+
+        child.on('close', (code) => {
+            clearTimeout(timer);
+            if (killed) {
+                resolve({ stdout: stdout.trim(), stderr: 'Time Limit Exceeded', time: '> ' + (timeLimit / 1000) + 's' });
+            } else {
+                resolve({ stdout: stdout.trim(), stderr: stderr.trim(), time: '0.1s' }); // Mock time measurement could be better
+            }
+        });
+
+        child.on('error', (err) => {
+            clearTimeout(timer);
+            resolve({ stdout: '', stderr: 'System Error: ' + err.message });
+        });
+    });
 };
 
 const executePython = async (code, input) => {
-    const filename = `sub_${Date.now()}_${Math.floor(Math.random() * 1000)}.py`;
-    const filepath = path.join(TEMP_DIR, filename);
+    const { dir } = createUniqueDir();
+    const solutionFile = 'solution.py';
+    const inputFile = 'input.txt';
 
     try {
-        fs.writeFileSync(filepath, code);
+        fs.writeFileSync(path.join(dir, solutionFile), code);
+        fs.writeFileSync(path.join(dir, inputFile), input || '');
 
-        // Use timeout -s SIGKILL to force kill if it hangs
-        // Mount temp dir to /mnt in container
-        // echo input | python file
-        const safeInput = input ? input.replace(/'/g, "'\\''") : '';
-        const dockerCmd = `docker run --rm --network none -v "${TEMP_DIR}:/mnt" python:3.9-alpine sh -c "echo '${safeInput}' | python /mnt/${filename}"`;
+        // Command: sh -c "python /mnt/solution.py < /mnt/input.txt"
+        // Note: Using sh -c is safe here because paths are hardcoded and not user-controlled
+        const args = ['sh', '-c', `python /mnt/${solutionFile} < /mnt/${inputFile}`];
 
-        const { stdout, stderr } = await execPromise(dockerCmd, { timeout: 3000 });
-        return { stdout: stdout.trim(), stderr: stderr.trim(), time: '0.1s' }; // Mock time for now
+        const result = await runContainer('python:3.9-alpine', args, dir);
+        return result;
 
-    } catch (error) {
-        // If timeout or runtime error
-        if (error.killed) {
-            return { stdout: '', stderr: 'Time Limit Exceeded' };
-        }
-        return { stdout: '', stderr: error.stderr || error.message };
+    } catch (err) {
+        return { stdout: '', stderr: err.message };
     } finally {
-        // Cleanup
-        if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
+        fs.rmSync(dir, { recursive: true, force: true });
     }
 };
 
 const executeCpp = async (code, input) => {
-    const filenameSource = `sub_${Date.now()}_${Math.floor(Math.random() * 1000)}.cpp`;
-    const filenameExe = filenameSource.replace('.cpp', '.out');
-    const filepathSource = path.join(TEMP_DIR, filenameSource);
+    const { dir } = createUniqueDir();
+    const sourceFile = 'solution.cpp';
+    const exeFile = 'solution.out';
+    const inputFile = 'input.txt';
 
     try {
-        fs.writeFileSync(filepathSource, code);
+        fs.writeFileSync(path.join(dir, sourceFile), code);
+        fs.writeFileSync(path.join(dir, inputFile), input || '');
 
-        // Command: g++ source.cpp -o source.out && echo input | ./source.out
-        const safeInput = input ? input.replace(/'/g, "'\\''") : '';
-        const dockerCmd = `docker run --rm --network none -v "${TEMP_DIR}:/mnt" gcc:latest sh -c "g++ /mnt/${filenameSource} -o /mnt/${filenameExe} && echo '${safeInput}' | /mnt/${filenameExe}"`;
+        // Uploaded code might fail compilation, so we separate compile and run?
+        // For simplicity in one go: g++ src -o out && ./out < input
+        const args = ['sh', '-c', `g++ /mnt/${sourceFile} -o /mnt/${exeFile} && /mnt/${exeFile} < /mnt/${inputFile}`];
 
-        const { stdout, stderr } = await execPromise(dockerCmd, { timeout: 5000 }); // Give C++ a bit more time for compilation
-        return { stdout: stdout.trim(), stderr: stderr.trim(), time: '0.05s' };
+        const result = await runContainer('gcc:latest', args, dir, 5000); // Give GCC more time
+        return result;
 
-    } catch (error) {
-        if (error.killed) {
-            return { stdout: '', stderr: 'Time Limit Exceeded' };
-        }
-        // Compilation error usually comes in stderr
-        return { stdout: '', stderr: error.stderr || error.message };
+    } catch (err) {
+        return { stdout: '', stderr: err.message };
     } finally {
-        if (fs.existsSync(filepathSource)) fs.unlinkSync(filepathSource);
-        // Clean up executable if it exists
-        const filepathExe = path.join(TEMP_DIR, filenameExe);
-        if (fs.existsSync(filepathExe)) fs.unlinkSync(filepathExe);
+        fs.rmSync(dir, { recursive: true, force: true });
     }
 };
 
 const executeJava = async (code, input) => {
-    // Java requires the class name to match the file name. 
-    // We enforce "public class Main" so we save as Main.java.
-    // To avoid collisions in concurrent requests, we use a unique folder for each submission.
-    const uniqueId = `${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-    const workDir = path.join(TEMP_DIR, uniqueId);
-
-    if (!fs.existsSync(workDir)) {
-        fs.mkdirSync(workDir, { recursive: true });
-    }
-
-    const filename = 'Main.java';
-    const filepath = path.join(workDir, filename);
+    const { dir } = createUniqueDir();
+    const sourceFile = 'Main.java'; // Java requirement
+    const inputFile = 'input.txt';
 
     try {
-        fs.writeFileSync(filepath, code);
+        fs.writeFileSync(path.join(dir, sourceFile), code);
+        fs.writeFileSync(path.join(dir, inputFile), input || '');
 
-        // Command: javac Main.java && echo 'input' | java Main
-        // We mount the workDir to /mnt in the container
-        const safeInput = input ? input.replace(/'/g, "'\\''") : '';
-        const dockerCmd = `docker run --rm --network none -v "${workDir}:/mnt" amazoncorretto:17-alpine sh -c "cd /mnt && javac Main.java && echo '${safeInput}' | java Main"`;
+        const args = ['sh', '-c', `javac /mnt/${sourceFile} && java -cp /mnt Main < /mnt/${inputFile}`];
 
-        const { stdout, stderr } = await execPromise(dockerCmd, { timeout: 5000 }); // Java JVM startup might take a bit
-        return { stdout: stdout.trim(), stderr: stderr.trim(), time: '0.1s' };
+        const result = await runContainer('amazoncorretto:17-alpine', args, dir, 5000);
+        return result;
 
-    } catch (error) {
-        if (error.killed) {
-            return { stdout: '', stderr: 'Time Limit Exceeded' };
-        }
-        return { stdout: '', stderr: error.stderr || error.message };
+    } catch (err) {
+        return { stdout: '', stderr: err.message };
     } finally {
-        // Cleanup the whole directory
-        if (fs.existsSync(workDir)) {
-            fs.rmSync(workDir, { recursive: true, force: true });
-        }
+        fs.rmSync(dir, { recursive: true, force: true });
     }
 };
 

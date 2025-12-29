@@ -52,6 +52,15 @@ router.post('/submit', authenticateToken, async (req, res) => {
         let log = [];
 
         // 2. Run against each test case
+        const normalize = (str) => {
+            if (!str) return '';
+            return str
+                .split('\n')
+                .map(line => line.trimEnd())
+                .join('\n')
+                .trim();
+        };
+
         for (const tc of testCases) {
             let result;
             if (language === 'python') {
@@ -68,13 +77,21 @@ router.post('/submit', authenticateToken, async (req, res) => {
             if (result.stderr) {
                 finalStatus = 'Runtime Error';
                 log.push(`Case ${tc.id}: RE`);
-                break; // Stop on first error ? Or continue? Usually stop or show all. Let's stop for MVP.
-            } else if (result.stdout.trim() !== tc.output_data.trim()) {
-                finalStatus = 'Wrong Answer';
-                log.push(`Case ${tc.id}: WA (Exp: ${tc.output_data.trim()}, Got: ${result.stdout.trim()})`);
-                break;
+                break; // Stop on first error
             } else {
-                log.push(`Case ${tc.id}: AC`);
+                const studentOut = normalize(result.stdout);
+                const expectedOut = normalize(tc.output_data);
+
+                if (studentOut !== expectedOut) {
+                    finalStatus = 'Wrong Answer';
+                    // Show diff in log for debugging (limit length)
+                    const showGot = studentOut.length > 50 ? studentOut.substring(0, 50) + '...' : studentOut;
+                    const showExp = expectedOut.length > 50 ? expectedOut.substring(0, 50) + '...' : expectedOut;
+                    log.push(`Case ${tc.id}: WA (Exp: "${showExp}", Got: "${showGot}")`);
+                    break;
+                } else {
+                    log.push(`Case ${tc.id}: AC`);
+                }
             }
         }
 

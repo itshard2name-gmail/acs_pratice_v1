@@ -71,4 +71,12 @@
     - [x] DB Schema: Add `difficulty` to questions <!-- id: 161 -->
     - [x] Admin UI: Difficulty Selector for AI & Manual <!-- id: 162 -->
     - [x] Exam UI: Level Selection Modal <!-- id: 163 -->
+- [ ] Phase 16: OCI Production Deployment <!-- id: 170 -->
+    - [x] Create Local Cloudflare Demo (docker-compose.demo.yml) <!-- id: 172 -->
+    - [ ] Create Production Docker Compose (docker-compose.prod.yml) <!-- id: 171 -->
+- [ ] Phase 17: Critical Security & Judge Refactor <!-- id: 180 -->
+    - [x] Security: Fix RCE in `judgeService.js` (Use safe spawn/execFile) <!-- id: 181 -->
+    - [x] Isolation: Fix Shared Directory Vulnerability (Unique temp dirs per run) <!-- id: 182 -->
+    - [x] Stability: Implement Output Normalization (Trim/Line Endings) <!-- id: 183 -->
+    - [x] Safety: Add Resource Limits (Memory/Timeout/Output Size) <!-- id: 184 -->
 

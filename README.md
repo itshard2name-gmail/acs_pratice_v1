@@ -88,6 +88,7 @@ Access the app at `http://localhost:8080`.
 *   [**Task List**](./TASK.md): Development progress tracker.
 *   [**System Design**](./SYSTEM_DESIGN.md): Architecture and Dev Guidelines.
 *   [**Walkthrough**](./WALKTHROUGH.md): Detailed feature verification steps.
+*   [**OCI Deployment**](./DEPLOYMENT_GUIDE_OCI.md): Step-by-step guide for deploying to Oracle Cloud.
 
 ## 📄 License
 MIT License.

@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: apcs_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_demo_data:/var/lib/postgresql/data
+      - ./server/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+      - ./server/seed.sql:/docker-entrypoint-initdb.d/2-seed.sql
+    restart: always
+
+  backend:
+    build: ./server
+    environment:
+      - PORT=3000
+      - POSTGRES_HOST=db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=apcs_db
+      - POSTGRES_PORT=5432
+      - JWT_SECRET=apcs-demo-secret
+    env_file:
+      - ./server/.env
+    ports:
+      - "3001:3000"
+    depends_on:
+      - db
+    restart: always
+
+  frontend:
+    build: ./client
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+    restart: always
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --url http://frontend:80
+    restart: always
+    depends_on:
+      - frontend
+
+volumes:
+  postgres_demo_data:
