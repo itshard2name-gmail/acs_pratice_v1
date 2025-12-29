@@ -51,7 +51,7 @@ function logout() {
             </router-link>
             
             <!-- Desktop Menu -->
-            <div class="hidden md:flex ml-2 space-x-4">
+            <div class="hidden lg:flex ml-2 space-x-4">
               <router-link to="/concept" 
                 class="px-3 py-2 rounded-md text-sm font-medium transition-colors text-gray-300 hover:text-white hover:bg-white/10"
                 active-class="bg-white/10 text-white"
@@ -73,7 +73,7 @@ function logout() {
           </div>
           
           <!-- Right Side Desktop -->
-          <div class="hidden md:flex items-center space-x-4">
+          <div class="hidden lg:flex items-center space-x-4">
              <template v-if="auth.user">
                 <router-link to="/profile" 
                   class="text-sm mr-2 text-gray-300 hover:text-white"
@@ -91,7 +91,7 @@ function logout() {
           </div>
 
           <!-- Mobile Menu Button -->
-          <div class="flex items-center md:hidden">
+          <div class="flex items-center lg:hidden">
             <button @click="toggleMobileMenu" class="text-gray-300 hover:text-white p-2">
               <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path v-if="!isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -103,7 +103,7 @@ function logout() {
       </div>
 
       <!-- Mobile Menu Dropdown -->
-      <div v-show="isMobileMenuOpen" class="md:hidden bg-[#1A1A1A] border-b border-white/10">
+      <div v-show="isMobileMenuOpen" class="lg:hidden bg-[#1A1A1A] border-b border-white/10">
         <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
           <router-link to="/concept" @click="closeMobileMenu"
             class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10"
