@@ -5,7 +5,8 @@ RUN apk add --no-cache \
     python3 \
     g++ \
     gcc \
-    musl-dev
+    musl-dev \
+    docker-cli
 
 WORKDIR /app
 

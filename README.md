@@ -75,12 +75,21 @@ docker-compose -f docker-compose.dev.yml up --build
 - Backend: `http://localhost:3000`
 - API Key: Set `GEMINI_API_KEY` in `.env` or export it before running.
 
-### Production Deployment
-Run the entire stack with Docker Compose:
+### Stage/Production Deployment
+To avoid conflicts with development containers, always use specific project names:
+
+**Stage Environment** (with Cloudflare Tunnel)
 ```bash
-docker-compose up --build -d
+docker compose -p apcs_stage -f docker-compose.stage.yml up -d --build
 ```
-Access the app at `http://localhost:8080`.
+- Frontend: `https://<your-tunnel-url>` (or localhost:3050)
+- Backend: localhost:3051
+- DB: localhost:5434
+
+**Dev Environment** (Full Docker)
+```bash
+docker compose -p apcs_dev -f docker-compose.dev.yml up --build
+```
 
 ## 📚 Documentation
 *   [**User Manual**](./USER_MANUAL.md): Comprehensive guide for Students and Admins.

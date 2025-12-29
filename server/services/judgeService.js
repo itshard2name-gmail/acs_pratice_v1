@@ -20,13 +20,23 @@ const createUniqueDir = () => {
 const runContainer = (image, cmdArgs, workDir, timeLimit = 3000) => {
     return new Promise((resolve) => {
         // Enforce resource limits
+        // Check if we are running in a container and need to map paths for the host daemon
+        let hostMountDir = workDir;
+        if (process.env.JUDGE_HOST_PATH) {
+            // workDir is inside the container (e.g. /app/temp_submissions/uuid)
+            // TEMP_DIR is /app/temp_submissions
+            // We want: /Users/Host/.../server/temp_submissions/uuid
+            const relativePart = path.relative(TEMP_DIR, workDir);
+            hostMountDir = path.join(process.env.JUDGE_HOST_PATH, relativePart);
+        }
+
         const dockerArgs = [
             'run',
             '--rm',
             '--network', 'none',    // No internet
             '--memory', '128m',     // Max 128MB RAM
             '--cpus', '0.5',        // Max 0.5 CPU
-            '-v', `${workDir}:/mnt`,
+            '-v', `${hostMountDir}:/mnt`,
             image,
             ...cmdArgs
         ];

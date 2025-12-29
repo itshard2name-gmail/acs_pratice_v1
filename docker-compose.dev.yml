@@ -32,6 +32,7 @@ services:
     volumes:
       - ./server:/app
       - /app/node_modules
+      - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - db
     command: sh -c "npm install && node --watch index.js"

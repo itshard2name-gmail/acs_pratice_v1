@@ -27,6 +27,9 @@ services:
       - JWT_SECRET=apcs-stage-secret
     env_file:
       - ./server/.env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./server/temp_submissions:/app/temp_submissions
     ports:
       - "${APCS_PRATICE_STG_BACKEND_PORT:-3051}:3000"
     depends_on:
@@ -50,3 +53,5 @@ services:
 
 volumes:
   postgres_stage_data:
+    external: true
+    name: apcs_stage_postgres_stage_data
